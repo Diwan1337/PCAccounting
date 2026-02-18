@@ -1,0 +1,185 @@
+@startuml PCAccountingClassDiagram
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+title PCAccounting - Актуальная диаграмма классов
+
+package "UI Layer" {
+  class MainWindow {
+    +MainWindow(controller: ApplicationController*, parent: QWidget* = nullptr)
+    --
+    -setupUi()
+    -setupEmployeesTab()
+    -setupComputersTab()
+    -setupStatsTab()
+    -setupMenu()
+    -refreshEmployees()
+    -refreshComputers()
+    -refreshStats()
+    -confirmDiscardChanges(): bool
+  }
+
+  class EmployeesTabWidget {
+    +EmployeesTabWidget(controller: ApplicationController*, parent: QWidget* = nullptr)
+    +refresh()
+    +applyFilter(text: QString)
+  }
+
+  class ComputersTabWidget {
+    +ComputersTabWidget(controller: ApplicationController*, parent: QWidget* = nullptr)
+    +refresh()
+    +applyFilter(text: QString)
+  }
+
+  class StatsTabWidget {
+    +StatsTabWidget(controller: ApplicationController*, parent: QWidget* = nullptr)
+    +refresh()
+  }
+
+  class EmployeeDialog {
+    +EmployeeDialog(parent: QWidget* = nullptr)
+    +setEmployee(employee: Employee)
+    +getEmployee(): Employee
+  }
+
+  class ComputerDialog {
+    +ComputerDialog(parent: QWidget* = nullptr)
+    +setComputer(computer: Computer)
+    +getComputer(): Computer
+  }
+}
+
+package "Core Layer" {
+  class ApplicationController {
+    -database: Database
+    -storage: StorageService
+    -currentPassword: string
+    -loaded: bool
+    -dirty: bool
+    --
+    +createNewDatabase(password: string)
+    +loadDatabase(path: string, password: string)
+    +saveDatabase(path: string)
+    +addEmployee(e: Employee): int
+    +addComputer(c: Computer): int
+    +assignComputer(empId: int, compId: int): bool
+    +removeEmployee(id: int)
+    +removeComputer(id: int)
+    +updateEmployee(e: Employee): bool
+    +updateComputer(c: Computer): bool
+    +getEmployees(): vector<Employee>
+    +getComputers(): vector<Computer>
+    +getReportRamLessThan(value: int): vector<Computer>
+    +getFreeComputers(): vector<Computer>
+    +isInventoryNumberUnique(inventoryNumber: string): bool
+    +isSerialNumberUnique(serialNumber: string): bool
+    +unassignComputerByComputerId(computerId: int): bool
+    +isLoaded(): bool
+    +isDirty(): bool
+  }
+
+  class Database {
+    -employees: vector<Employee>
+    -computers: vector<Computer>
+    -nextEmployeeId: int
+    -nextComputerId: int
+    --
+    +addEmployee(employee: Employee): int
+    +addComputer(computer: Computer): int
+    +addEmployeeWithId(employee: Employee): int
+    +addComputerWithId(computer: Computer): int
+    +removeEmployee(id: int)
+    +removeComputer(id: int)
+    +updateEmployee(employee: Employee): bool
+    +updateComputer(computer: Computer): bool
+    +findEmployeeById(id: int): Employee*
+    +findComputerById(id: int): Computer*
+    +assignComputer(employeeId: int, computerId: int): bool
+    +unassignComputer(employeeId: int): bool
+    +unassignComputerByComputerId(computerId: int): bool
+    +getFreeComputers(): vector<Computer>
+    +getEmployees(): vector<Employee>
+    +getComputers(): vector<Computer>
+    +getComputersWithRamLessThan(value: int): vector<Computer>
+    +findEmployeesByLastName(name: string): vector<Employee>
+    +findComputersByInventory(inventory: string): vector<Computer>
+    +isInventoryNumberUnique(inventoryNumber: string): bool
+    +isSerialNumberUnique(serialNumber: string): bool
+    +validate()
+  }
+}
+
+package "Storage/Crypto" {
+  class StorageService {
+    +saveDatabase(db: Database, filePath: string, password: string)
+    +loadDatabase(filePath: string, password: string): Database
+  }
+
+  class Serializer {
+    +serialize(db: Database): vector<byte>
+    +deserialize(data: vector<byte>): Database
+  }
+
+  class CryptoService {
+    +encrypt(data: vector<byte>, password: string): vector<byte>
+    +decrypt(data: vector<byte>, password: string): vector<byte>
+  }
+}
+
+package "Domain Models" {
+  class Employee {
+    +id: int
+    +institute: string
+    +department: string
+    +lastName: string
+    +initials: string
+    +position: string
+    +phone: string
+    +email: string
+    +employmentDate: string
+    +status: string
+    +computerId: optional<int>
+  }
+
+  class Computer {
+    +id: int
+    +inventoryNumber: string
+    +serialNumber: string
+    +manufacturer: string
+    +model: string
+    +cpuModel: string
+    +chipset: string
+    +ramSize: int
+    +storageType: string
+    +storageSize: int
+    +roomNumber: string
+    +condition: string
+    +commissioningDate: string
+    +lastMaintenanceDate: string
+    +warrantyExpirationDate: string
+  }
+}
+
+MainWindow --> ApplicationController
+EmployeesTabWidget --> ApplicationController
+ComputersTabWidget --> ApplicationController
+StatsTabWidget --> ApplicationController
+EmployeeDialog ..> Employee
+ComputerDialog ..> Computer
+
+ApplicationController *-- Database
+ApplicationController *-- StorageService
+Database *-- "0..*" Employee
+Database *-- "0..*" Computer
+StorageService ..> Serializer
+StorageService ..> CryptoService
+Serializer ..> Database
+
+note bottom of Database
+  Логическая связь Employee-Computer:
+  0..1 <-> 0..1 через Employee.computerId
+end note
+
+@enduml
