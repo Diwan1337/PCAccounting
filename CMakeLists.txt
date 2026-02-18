@@ -1,4 +1,4 @@
-set(BACKEND_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../projects/src)
+set(BACKEND_DIR ${CMAKE_CURRENT_SOURCE_DIR}/projects/src)
 
 cmake_minimum_required(VERSION 3.19)
 project(PCAccountingQt LANGUAGES CXX)

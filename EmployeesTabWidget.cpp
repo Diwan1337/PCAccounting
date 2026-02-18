@@ -1,5 +1,5 @@
 #include "EmployeesTabWidget.h"
-#include "../projects/src/core/ApplicationController.h"
+#include "projects/src/core/ApplicationController.h"
 
 #include <QTableWidget>
 #include <QHeaderView>

@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "../projects/src/core/ApplicationController.h"
+#include "projects/src/core/ApplicationController.h"
 #include <QApplication>
 #include <QPalette>
 #include <QColor>
