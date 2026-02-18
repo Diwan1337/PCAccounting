@@ -63,19 +63,13 @@ cmake --build build
 ### Вкладка сотрудников
 <img width="999" height="629" alt="image" src="https://github.com/user-attachments/assets/c8e07c8c-3765-4c90-b4d7-8811ee4e1349" />
 
-![Сотрудники](docs/screenshots/employees.png)
-
 ### Вкладка компьютеров
 
-![Компьютеры](docs/screenshots/computers.png)
-
-### Фильтры и сортировка
-
-![Фильтры](docs/screenshots/filters.png)
+<img width="996" height="629" alt="image" src="https://github.com/user-attachments/assets/c6c10d70-5b6b-444e-86ca-63af8303d3fe" />
 
 ### Полные таблицы
 
-![Полные таблицы](docs/screenshots/full-tables.png)
+<img width="1378" height="716" alt="image" src="https://github.com/user-attachments/assets/25d71daf-b3e4-4022-8b1f-3a1faec7f5b4" />
 
 ## Автор
 
