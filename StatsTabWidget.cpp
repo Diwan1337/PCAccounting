@@ -1,5 +1,5 @@
 #include "StatsTabWidget.h"
-#include "../projects/src/core/ApplicationController.h"
+#include "projects/src/core/ApplicationController.h"
 
 #include <QVBoxLayout>
 #include <QLabel>

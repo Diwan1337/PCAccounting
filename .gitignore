@@ -1,6 +1,7 @@
 build/
 **/build*/
 .qtcreator/
+.vscode/
 *.pro.user
 *.pro.user.*
 *.obj
