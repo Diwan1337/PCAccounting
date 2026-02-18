@@ -61,7 +61,7 @@ cmake --build build
 > Ниже оставлены места под твои изображения.
 
 ### Вкладка сотрудников
-
+<img width="999" height="629" alt="image" src="https://github.com/user-attachments/assets/c8e07c8c-3765-4c90-b4d7-8811ee4e1349" />
 ![Сотрудники](docs/screenshots/employees.png)
 
 ### Вкладка компьютеров
