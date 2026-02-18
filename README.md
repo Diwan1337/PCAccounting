@@ -56,6 +56,11 @@ cmake --build build
 
 После сборки исполняемый файл находится в папке `build` (конкретный путь зависит от генератора/IDE).
 
+## UML (PlantUML)
+
+- Актуальная диаграмма классов: `docs/uml/pcaccounting-class-diagram.puml`
+- Можно открыть в VS Code (PlantUML extension) или на PlantUML server.
+
 ## Скриншоты
 
 > Ниже оставлены места под твои изображения.
