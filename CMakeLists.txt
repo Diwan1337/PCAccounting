@@ -8,7 +8,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 qt_standard_project_setup()
 
 qt_add_executable(PCAccountingQt
-    WIN32
+    
     main.cpp
     mainwindow.cpp
     mainwindow_ui.cpp
@@ -34,8 +34,7 @@ qt_add_executable(PCAccountingQt
     ${BACKEND_DIR}/storage/Serializer.cpp
     ${BACKEND_DIR}/storage/StorageService.cpp
     ${BACKEND_DIR}/utils/DateUtils.cpp
-    ${BACKEND_DIR}/models/Computer.cpp
-    ${BACKEND_DIR}/models/Employee.cpp
+    
 )
 
 target_include_directories(PCAccountingQt
