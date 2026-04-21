@@ -27,20 +27,66 @@
 
 ```text
 PCAccountingQt/
-  main.cpp
-  mainwindow*.cpp/h
-  EmployeesTabWidget.*
-  ComputersTabWidget.*
-  StatsTabWidget.*
-  EmployeeDialog.*
-  ComputerDialog.*
-  projects/
-    src/
+  CMakeLists.txt
+  README.md
+  mainwindow.ui
+  PCAccountingQt_ru_RU.ts
+  docs/
+  src/
+    app/
+      main.cpp
+    ui/
+      main_window/
+      tabs/
+      dialogs/
+    backend/
       core/
       storage/
       crypto/
       models/
       utils/
+  tests/
+    backend/
+  build/          # локальная сборка, не прикладывается
+  projects/       # старый/архивный код, не прикладывается
+  .qtcreator/     # настройки IDE, не прикладываются
+  .trunk/         # служебные файлы линтера, не прикладываются
+  .git/           # git-метаданные, не прикладываются
+```
+
+## Что сдавать
+
+Для сдачи проекта достаточно оставить:
+
+- `src/`
+- `CMakeLists.txt`
+- `mainwindow.ui`
+- `PCAccountingQt_ru_RU.ts`
+- `README.md`
+
+По ситуации можно также приложить:
+
+- `docs/`, если преподаватель просит UML, ТЗ, спецификации или скриншоты
+- `tests/`, если преподаватель просит тесты или нужно показать проверку логики
+
+Обычно не нужно прикладывать:
+
+- `.git/`
+- `.qtcreator/`
+- `.trunk/`
+- `build/`
+- `projects/`
+- бинарные и временные файлы: `*.exe`, `*.dll`, `*.obj`, `*.o`, `*.pdb`, `*.ilk`, `*.log`, `*.db`, `*.bin`
+
+Если нужна "чистая" версия архива для сдачи, то оптимальный состав такой:
+
+```text
+PCAccountingQt/
+  CMakeLists.txt
+  README.md
+  mainwindow.ui
+  PCAccountingQt_ru_RU.ts
+  src/
 ```
 
 ## Сборка (Windows, Qt + MinGW)

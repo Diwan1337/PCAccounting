@@ -2,7 +2,7 @@
 
 #include <QObject>
 #include <QDialog>
-#include "models/Employee.h"
+#include "backend/models/Employee.h"
 
 class QLineEdit;
 class QComboBox;

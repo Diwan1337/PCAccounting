@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 
-#include "EmployeesTabWidget.h"
-#include "ComputersTabWidget.h"
+#include "ui/tabs/EmployeesTabWidget.h"
+#include "ui/tabs/ComputersTabWidget.h"
 
 void MainWindow::onSearchTextChanged(const QString& text)
 {

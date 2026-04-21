@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-#include "StatsTabWidget.h"
+#include "ui/tabs/StatsTabWidget.h"
 
 void MainWindow::refreshStats()
 {

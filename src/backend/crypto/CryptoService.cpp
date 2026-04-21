@@ -6,8 +6,6 @@
 
 #pragma comment(lib, "bcrypt.lib")
 
-// --- Вспомогательная функция SHA256 ---
-
 static std::vector<unsigned char> sha256(const std::string& input) {
     BCRYPT_ALG_HANDLE hAlg = nullptr;
     BCRYPT_HASH_HANDLE hHash = nullptr;
@@ -48,8 +46,6 @@ static std::vector<unsigned char> sha256(const std::string& input) {
 
     return hash;
 }
-
-// --- AES-256 CBC ---
 
 std::vector<unsigned char> CryptoService::encrypt(
     const std::vector<unsigned char>& data,
@@ -114,7 +110,6 @@ std::vector<unsigned char> CryptoService::encrypt(
     BCryptDestroyKey(hKey);
     BCryptCloseAlgorithmProvider(hAlg, 0);
 
-    // Вставляем IV в начало файла
     encrypted.insert(encrypted.begin(), iv.begin(), iv.end());
 
     return encrypted;
@@ -154,7 +149,6 @@ std::vector<unsigned char> CryptoService::decrypt(
 
     std::vector<unsigned char> ivCopy = iv;
 
-    // Первый вызов - только для вычисления размера
     BCryptDecrypt(hKey,
                 encrypted.data(),
                 encrypted.size(),
@@ -166,7 +160,6 @@ std::vector<unsigned char> CryptoService::decrypt(
                 &dataLen,
                 BCRYPT_BLOCK_PADDING);
 
-    // Нужно восстановить IV перед вторым вызовом
     ivCopy = iv;
 
     std::vector<unsigned char> decrypted(dataLen);

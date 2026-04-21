@@ -1,5 +1,5 @@
 #include "EmployeesTabWidget.h"
-#include "projects/src/core/ApplicationController.h"
+#include "backend/core/ApplicationController.h"
 
 #include <QTableWidget>
 #include <QHeaderView>
@@ -22,9 +22,9 @@
 #include <exception>
 #include <vector>
 
-#include "models/Employee.h"
-#include "models/Computer.h"
-#include "EmployeeDialog.h"
+#include "backend/models/Employee.h"
+#include "backend/models/Computer.h"
+#include "ui/dialogs/EmployeeDialog.h"
 
 EmployeesTabWidget::EmployeesTabWidget(ApplicationController* controller,
                                        QWidget* parent)

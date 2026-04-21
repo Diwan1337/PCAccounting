@@ -5,8 +5,6 @@
 #include <unordered_set>
 #include "../utils/DateUtils.h"
 
-// Добавление
-
 int Database::addEmployee(Employee employee) {
     employee.id = nextEmployeeId++;
     employees.push_back(employee);
@@ -57,8 +55,6 @@ int Database::addComputerWithId(const Computer& computer) {
     return computer.id;
 }
 
-// Удаление
-
 void Database::removeEmployee(int id) {
     employees.erase(
         std::remove_if(employees.begin(), employees.end(),
@@ -69,7 +65,6 @@ void Database::removeEmployee(int id) {
 
 void Database::removeComputer(int id) {
 
-    // Снять назначение у сотрудников
     for (auto& e : employees) {
         if (e.computerId.has_value() && e.computerId.value() == id) {
             e.computerId.reset();
@@ -82,8 +77,6 @@ void Database::removeComputer(int id) {
         computers.end()
     );
 }
-
-// Обновление
 
 bool Database::updateEmployee(const Employee& employee) {
     for (auto& e : employees) {
@@ -114,8 +107,6 @@ bool Database::updateComputer(const Computer& computer) {
     return false;
 }
 
-// Поиск
-
 Employee* Database::findEmployeeById(int id) {
     for (auto& e : employees)
         if (e.id == id)
@@ -129,8 +120,6 @@ Computer* Database::findComputerById(int id) {
             return &c;
     return nullptr;
 }
-
-// Проверка уникальности
 
 bool Database::isInventoryNumberUnique(const std::string& inventoryNumber) const {
     for (const auto& c : computers)
@@ -146,10 +135,7 @@ bool Database::isSerialNumberUnique(const std::string& serialNumber) const {
     return true;
 }
 
-// Назначение ПК
-
 bool Database::assignComputer(int employeeId, int computerId) {
-
     Employee* employee = findEmployeeById(employeeId);
     Computer* computer = findComputerById(computerId);
 
@@ -159,13 +145,11 @@ bool Database::assignComputer(int employeeId, int computerId) {
     if (employee->status == "Уволен")
         return false;
 
-    // Проверяем, не занят ли компьютер
     for (const auto& e : employees) {
         if (e.computerId.has_value() &&
             e.computerId.value() == computerId)
             return false;
     }
-
     employee->computerId = computerId;
     return true;
 }
@@ -190,8 +174,6 @@ bool Database::unassignComputerByComputerId(int computerId) {
     return false;
 }
 
-// Свободные ПК
-
 std::vector<Computer> Database::getFreeComputers() const {
 
     std::vector<Computer> freeComputers;
@@ -215,8 +197,6 @@ std::vector<Computer> Database::getFreeComputers() const {
     return freeComputers;
 }
 
-// Геттеры
-
 const std::vector<Employee>& Database::getEmployees() const {
     return employees;
 }
@@ -224,8 +204,6 @@ const std::vector<Employee>& Database::getEmployees() const {
 const std::vector<Computer>& Database::getComputers() const {
     return computers;
 }
-
-// Отчет
 
 std::vector<Computer> Database::getComputersWithRamLessThan(int value) const {
 
@@ -238,8 +216,6 @@ std::vector<Computer> Database::getComputersWithRamLessThan(int value) const {
 
     return result;
 }
-
-// Поиск
 
 std::vector<Employee> Database::findEmployeesByLastName(const std::string& name) const {
 
@@ -264,8 +240,6 @@ std::vector<Computer> Database::findComputersByInventory(const std::string& inve
 
     return result;
 }
-
-// Валидация
 
 void Database::validate() const {
 

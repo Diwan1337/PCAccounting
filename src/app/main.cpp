@@ -1,5 +1,5 @@
-#include "mainwindow.h"
-#include "projects/src/core/ApplicationController.h"
+#include "ui/main_window/mainwindow.h"
+#include "backend/core/ApplicationController.h"
 #include <QApplication>
 #include <QPalette>
 #include <QColor>
@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
     darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
     darkPalette.setColor(QPalette::ToolTipText, Qt::white);
     darkPalette.setColor(QPalette::Text, Qt::white);
+    darkPalette.setColor(QPalette::PlaceholderText, QColor(170,170,170));
     darkPalette.setColor(QPalette::Button, QColor(53,53,53));
     darkPalette.setColor(QPalette::ButtonText, Qt::white);
     darkPalette.setColor(QPalette::Highlight, QColor(42,130,218));

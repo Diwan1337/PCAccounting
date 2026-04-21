@@ -2,7 +2,7 @@
 
 #include <QObject>
 #include <QDialog>
-#include "models/Computer.h"
+#include "backend/models/Computer.h"
 
 class QLineEdit;
 class QSpinBox;

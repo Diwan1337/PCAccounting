@@ -1,5 +1,5 @@
 #include "ComputersTabWidget.h"
-#include "projects/src/core/ApplicationController.h"
+#include "backend/core/ApplicationController.h"
 
 #include <QTableWidget>
 #include <QHeaderView>
@@ -25,9 +25,9 @@
 #include <exception>
 #include <vector>
 
-#include "models/Employee.h"
-#include "models/Computer.h"
-#include "ComputerDialog.h"
+#include "backend/models/Employee.h"
+#include "backend/models/Computer.h"
+#include "ui/dialogs/ComputerDialog.h"
 
 namespace {
 QDate parseUiDate(const std::string& value)

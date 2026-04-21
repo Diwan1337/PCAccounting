@@ -9,9 +9,9 @@
 #include <QToolBar>
 #include <QMenu>
 
-#include "EmployeesTabWidget.h"
-#include "ComputersTabWidget.h"
-#include "StatsTabWidget.h"
+#include "ui/tabs/EmployeesTabWidget.h"
+#include "ui/tabs/ComputersTabWidget.h"
+#include "ui/tabs/StatsTabWidget.h"
 
 void MainWindow::setupUi()
 {
