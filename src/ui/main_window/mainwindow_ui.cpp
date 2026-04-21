@@ -22,7 +22,6 @@ void MainWindow::setupUi()
 
     QVBoxLayout* mainLayout = new QVBoxLayout(central);
 
-    // Поиск
     QHBoxLayout* searchLayout = new QHBoxLayout();
     QLabel* searchLabel = new QLabel("Поиск:");
     searchEdit = new QLineEdit();
@@ -32,7 +31,6 @@ void MainWindow::setupUi()
 
     mainLayout->addLayout(searchLayout);
 
-    // Вкладки
     tabWidget = new QTabWidget();
     mainLayout->addWidget(tabWidget);
 
