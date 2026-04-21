@@ -15,7 +15,7 @@ struct Computer {
     int storageSize;
 
     std::string roomNumber;
-    std::string condition; // Рабочее / Требует ремонта / Списан
+    std::string condition;
 
     std::string commissioningDate;
     std::string lastMaintenanceDate;

@@ -12,9 +12,9 @@ struct Employee {
 
     std::string phone;
     std::string email;
-    std::string employmentDate; // пока строка, позже можно Date
+    std::string employmentDate;
 
-    std::string status; // "Активен", "Уволен"
+    std::string status;
 
-    std::optional<int> computerId; // null если не закреплен
+    std::optional<int> computerId;
 };
