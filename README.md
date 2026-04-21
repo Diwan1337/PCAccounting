@@ -47,54 +47,6 @@ PCAccountingQt/
       utils/
 ```
 
-## Что сдавать
-
-Для сдачи проекта достаточно оставить:
-
-- `src/`
-- `CMakeLists.txt`
-- `mainwindow.ui`
-- `PCAccountingQt_ru_RU.ts`
-- `README.md`
-
-По ситуации можно также приложить:
-
-- `docs/`, если преподаватель просит UML, ТЗ, спецификации или скриншоты
-- `tests/`, если преподаватель просит тесты или нужно показать проверку логики
-
-Обычно не нужно прикладывать:
-
-- `.git/`
-- `.qtcreator/`
-- `.trunk/`
-- `build/`
-- `projects/`
-- бинарные и временные файлы: `*.exe`, `*.dll`, `*.obj`, `*.o`, `*.pdb`, `*.ilk`, `*.log`, `*.db`, `*.bin`
-
-Если нужна "чистая" версия архива для сдачи, то оптимальный состав такой:
-
-```text
-PCAccountingQt/
-  CMakeLists.txt
-  README.md
-  mainwindow.ui
-  PCAccountingQt_ru_RU.ts
-  src/
-```
-
-## Сборка (Windows, Qt + MinGW)
-
-```bash
-cmake -S . -B build
-cmake --build build
-```
-
-Если у тебя несколько toolchain, проверь что используется корректный MinGW/Qt комплект.
-
-## Запуск
-
-После сборки исполняемый файл находится в папке `build` (конкретный путь зависит от генератора/IDE).
-
 ## UML (PlantUML)
 
 - Актуальная диаграмма классов: `docs/uml/pcaccounting-class-diagram.puml`
