@@ -1,50 +1,35 @@
 #include "CryptoService.h"
-#include <windows.h>
-#include <bcrypt.h>
+
+#include <openssl/err.h>
+#include <openssl/evp.h>
+#include <openssl/rand.h>
+#include <openssl/sha.h>
+
 #include <stdexcept>
 #include <vector>
 
-#pragma comment(lib, "bcrypt.lib")
-
 static std::vector<unsigned char> sha256(const std::string& input) {
-    BCRYPT_ALG_HANDLE hAlg = nullptr;
-    BCRYPT_HASH_HANDLE hHash = nullptr;
-
-    DWORD hashObjectSize = 0;
-    DWORD data = 0;
-    DWORD hashSize = 0;
-
-    if (BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_SHA256_ALGORITHM, nullptr, 0) != 0)
-        throw std::runtime_error("Failed to open SHA256 provider");
-
-    BCryptGetProperty(hAlg, BCRYPT_OBJECT_LENGTH,
-                      (PUCHAR)&hashObjectSize, sizeof(DWORD), &data, 0);
-
-    BCryptGetProperty(hAlg, BCRYPT_HASH_LENGTH,
-                      (PUCHAR)&hashSize, sizeof(DWORD), &data, 0);
-
-    std::vector<unsigned char> hashObject(hashObjectSize);
-    std::vector<unsigned char> hash(hashSize);
-
-    if (BCryptCreateHash(hAlg, &hHash,
-                         hashObject.data(), hashObjectSize,
-                         nullptr, 0, 0) != 0)
-        throw std::runtime_error("Failed to create hash");
-
-    BCryptHashData(hHash,
-                   (PUCHAR)input.data(),
-                   (ULONG)input.size(),
-                   0);
-
-    BCryptFinishHash(hHash,
-                     hash.data(),
-                     hashSize,
-                     0);
-
-    BCryptDestroyHash(hHash);
-    BCryptCloseAlgorithmProvider(hAlg, 0);
-
+    std::vector<unsigned char> hash(SHA256_DIGEST_LENGTH);
+    if (SHA256(reinterpret_cast<const unsigned char*>(input.data()),
+               input.size(),
+               hash.data()) == nullptr) {
+        throw std::runtime_error("Failed to calculate SHA-256");
+    }
     return hash;
+}
+
+static std::runtime_error makeOpenSslError(const std::string& prefix) {
+    unsigned long errorCode = ERR_get_error();
+    char buffer[256] = {};
+    if (errorCode != 0)
+        ERR_error_string_n(errorCode, buffer, sizeof(buffer));
+
+    std::string message = prefix;
+    if (errorCode != 0) {
+        message += ": ";
+        message += buffer;
+    }
+    return std::runtime_error(message);
 }
 
 std::vector<unsigned char> CryptoService::encrypt(
@@ -52,66 +37,48 @@ std::vector<unsigned char> CryptoService::encrypt(
     const std::string& password)
 {
     auto key = sha256(password);
+    const EVP_CIPHER* cipher = EVP_aes_256_cbc();
+    const int ivLength = EVP_CIPHER_iv_length(cipher);
+    const int blockSize = EVP_CIPHER_block_size(cipher);
 
-    BCRYPT_ALG_HANDLE hAlg = nullptr;
-    BCRYPT_KEY_HANDLE hKey = nullptr;
+    std::vector<unsigned char> iv(ivLength);
+    if (RAND_bytes(iv.data(), ivLength) != 1)
+        throw makeOpenSslError("Failed to generate IV");
 
-    DWORD dataLen = 0;
-    DWORD blockLen = 0;
-    DWORD cbData = 0;
+    EVP_CIPHER_CTX* rawContext = EVP_CIPHER_CTX_new();
+    if (rawContext == nullptr)
+        throw makeOpenSslError("Failed to create OpenSSL cipher context");
 
-    if (BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_AES_ALGORITHM, nullptr, 0) != 0)
-        throw std::runtime_error("Failed to open AES provider");
+    struct CipherContextGuard {
+        EVP_CIPHER_CTX* context;
+        ~CipherContextGuard() {
+            EVP_CIPHER_CTX_free(context);
+        }
+    } contextGuard{rawContext};
 
-    BCryptSetProperty(hAlg, BCRYPT_CHAINING_MODE,
-                      (PUCHAR)BCRYPT_CHAIN_MODE_CBC,
-                      sizeof(BCRYPT_CHAIN_MODE_CBC), 0);
+    if (EVP_EncryptInit_ex(rawContext, cipher, nullptr, key.data(), iv.data()) != 1)
+        throw makeOpenSslError("Failed to initialize AES-256-CBC encryption");
 
-    BCryptGetProperty(hAlg, BCRYPT_BLOCK_LENGTH,
-                      (PUCHAR)&blockLen, sizeof(DWORD),
-                      &cbData, 0);
+    std::vector<unsigned char> encrypted(data.size() + blockSize);
+    int written = 0;
+    int finalWritten = 0;
 
-    std::vector<unsigned char> iv(blockLen);
-    BCryptGenRandom(nullptr, iv.data(), blockLen, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+    if (EVP_EncryptUpdate(rawContext,
+                          encrypted.data(),
+                          &written,
+                          data.data(),
+                          static_cast<int>(data.size())) != 1) {
+        throw makeOpenSslError("Failed to encrypt data");
+    }
 
-    if (BCryptGenerateSymmetricKey(hAlg, &hKey,
-                                   nullptr, 0,
-                                   key.data(), key.size(), 0) != 0)
-        throw std::runtime_error("Failed to generate AES key");
+    if (EVP_EncryptFinal_ex(rawContext,
+                            encrypted.data() + written,
+                            &finalWritten) != 1) {
+        throw makeOpenSslError("Failed to finalize encryption");
+    }
 
-    BCryptEncrypt(hKey,
-                  (PUCHAR)data.data(),
-                  (ULONG)data.size(),
-                  nullptr,
-                  iv.data(),
-                  blockLen,
-                  nullptr,
-                  0,
-                  &dataLen,
-                  BCRYPT_BLOCK_PADDING);
-
-    std::vector<unsigned char> ivCopy = iv;
-    std::vector<unsigned char> encrypted(dataLen);
-
-    BCryptEncrypt(hKey,
-              (PUCHAR)data.data(),
-              (ULONG)data.size(),
-              nullptr,
-              ivCopy.data(),
-              blockLen,
-              encrypted.data(),
-              dataLen,
-              &dataLen,
-              BCRYPT_BLOCK_PADDING);
-
-
-    encrypted.resize(dataLen);
-
-    BCryptDestroyKey(hKey);
-    BCryptCloseAlgorithmProvider(hAlg, 0);
-
+    encrypted.resize(written + finalWritten);
     encrypted.insert(encrypted.begin(), iv.begin(), iv.end());
-
     return encrypted;
 }
 
@@ -120,67 +87,48 @@ std::vector<unsigned char> CryptoService::decrypt(
     const std::string& password)
 {
     auto key = sha256(password);
+    const EVP_CIPHER* cipher = EVP_aes_256_cbc();
+    const int ivLength = EVP_CIPHER_iv_length(cipher);
+    const int blockSize = EVP_CIPHER_block_size(cipher);
 
-    BCRYPT_ALG_HANDLE hAlg = nullptr;
-    BCRYPT_KEY_HANDLE hKey = nullptr;
+    if (data.size() < static_cast<size_t>(ivLength))
+        throw std::runtime_error("Encrypted payload is too short");
 
-    DWORD blockLen = 0;
-    DWORD cbData = 0;
-    DWORD dataLen = 0;
+    std::vector<unsigned char> iv(data.begin(), data.begin() + ivLength);
+    std::vector<unsigned char> encrypted(data.begin() + ivLength, data.end());
 
-    if (BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_AES_ALGORITHM, nullptr, 0) != 0)
-        throw std::runtime_error("Failed to open AES provider");
+    EVP_CIPHER_CTX* rawContext = EVP_CIPHER_CTX_new();
+    if (rawContext == nullptr)
+        throw makeOpenSslError("Failed to create OpenSSL cipher context");
 
-    BCryptSetProperty(hAlg, BCRYPT_CHAINING_MODE,
-                      (PUCHAR)BCRYPT_CHAIN_MODE_CBC,
-                      sizeof(BCRYPT_CHAIN_MODE_CBC), 0);
+    struct CipherContextGuard {
+        EVP_CIPHER_CTX* context;
+        ~CipherContextGuard() {
+            EVP_CIPHER_CTX_free(context);
+        }
+    } contextGuard{rawContext};
 
-    BCryptGetProperty(hAlg, BCRYPT_BLOCK_LENGTH,
-                      (PUCHAR)&blockLen, sizeof(DWORD),
-                      &cbData, 0);
+    if (EVP_DecryptInit_ex(rawContext, cipher, nullptr, key.data(), iv.data()) != 1)
+        throw makeOpenSslError("Failed to initialize AES-256-CBC decryption");
 
-    std::vector<unsigned char> iv(data.begin(), data.begin() + blockLen);
-    std::vector<unsigned char> encrypted(data.begin() + blockLen, data.end());
+    std::vector<unsigned char> decrypted(encrypted.size() + blockSize);
+    int written = 0;
+    int finalWritten = 0;
 
-    if (BCryptGenerateSymmetricKey(hAlg, &hKey,
-                                nullptr, 0,
-                                key.data(), key.size(), 0) != 0)
-        throw std::runtime_error("Failed to generate AES key");
+    if (EVP_DecryptUpdate(rawContext,
+                          decrypted.data(),
+                          &written,
+                          encrypted.data(),
+                          static_cast<int>(encrypted.size())) != 1) {
+        throw makeOpenSslError("Failed to decrypt data");
+    }
 
-    std::vector<unsigned char> ivCopy = iv;
+    if (EVP_DecryptFinal_ex(rawContext,
+                            decrypted.data() + written,
+                            &finalWritten) != 1) {
+        throw std::runtime_error("Decryption failed (wrong password or corrupted data)");
+    }
 
-    BCryptDecrypt(hKey,
-                encrypted.data(),
-                encrypted.size(),
-                nullptr,
-                ivCopy.data(),
-                blockLen,
-                nullptr,
-                0,
-                &dataLen,
-                BCRYPT_BLOCK_PADDING);
-
-    ivCopy = iv;
-
-    std::vector<unsigned char> decrypted(dataLen);
-
-    if (BCryptDecrypt(hKey,
-                    encrypted.data(),
-                    encrypted.size(),
-                    nullptr,
-                    ivCopy.data(),
-                    blockLen,
-                    decrypted.data(),
-                    dataLen,
-                    &dataLen,
-                    BCRYPT_BLOCK_PADDING) != 0)
-        throw std::runtime_error("Decryption failed (wrong password?)");
-
-
-    decrypted.resize(dataLen);
-
-    BCryptDestroyKey(hKey);
-    BCryptCloseAlgorithmProvider(hAlg, 0);
-
+    decrypted.resize(written + finalWritten);
     return decrypted;
 }
