@@ -15,7 +15,6 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QTextStream>
-#include <QStringConverter>
 
 StatsTabWidget::StatsTabWidget(ApplicationController* controller,
                                QWidget* parent)
@@ -169,7 +168,7 @@ void StatsTabWidget::onSaveReport()
     }
 
     QTextStream out(&file);
-    out.setEncoding(QStringConverter::Utf8);
+    out.setCodec("UTF-8");
     out << buildReportText();
     file.close();
 

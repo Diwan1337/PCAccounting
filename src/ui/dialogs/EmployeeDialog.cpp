@@ -8,6 +8,15 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 
+namespace {
+QString normalizePhone(const QString& phone)
+{
+    QString normalized = phone.trimmed();
+    normalized.remove(QRegularExpression("[\\s\\-\\(\\)]"));
+    return normalized;
+}
+}
+
 EmployeeDialog::EmployeeDialog(QWidget* parent)
     : QDialog(parent),
       instituteEdit(new QLineEdit(this)),
@@ -21,9 +30,10 @@ EmployeeDialog::EmployeeDialog(QWidget* parent)
 {
     QFormLayout* layout = new QFormLayout(this);
 
-    QRegularExpression phoneRx("^\\+\\d\\(\\d{3}\\)\\d{2}-\\d{2}-\\d{2}$");
-    phoneEdit->setValidator(new QRegularExpressionValidator(phoneRx, phoneEdit));
-    phoneEdit->setPlaceholderText("+7(999)12-34-56");
+    QRegularExpression phoneInputRx("^\\+?[\\d\\s\\-\\(\\)]{0,20}$");
+    QRegularExpression phoneStoredRx("^\\+\\d{11}$");
+    phoneEdit->setValidator(new QRegularExpressionValidator(phoneInputRx, phoneEdit));
+    phoneEdit->setPlaceholderText("+79991234567");
 
     QRegularExpression emailRx("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
     emailEdit->setValidator(new QRegularExpressionValidator(emailRx, emailEdit));
@@ -43,14 +53,14 @@ EmployeeDialog::EmployeeDialog(QWidget* parent)
         new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     layout->addRow(buttons);
 
-    connect(buttons, &QDialogButtonBox::accepted, this, [this, phoneRx, emailRx]() {
+    connect(buttons, &QDialogButtonBox::accepted, this, [this, phoneStoredRx, emailRx]() {
         if (lastNameEdit->text().trimmed().isEmpty()) {
             QMessageBox::warning(this, "Ошибка", "Фамилия обязательна");
             return;
         }
-        QString phone = phoneEdit->text().trimmed();
-        if (!phone.isEmpty() && !phoneRx.match(phone).hasMatch()) {
-            QMessageBox::warning(this, "Ошибка", "Телефон в формате +X(XXX)XX-XX-XX");
+        QString phone = normalizePhone(phoneEdit->text());
+        if (!phone.isEmpty() && !phoneStoredRx.match(phone).hasMatch()) {
+            QMessageBox::warning(this, "Ошибка", "Телефон должен содержать 11 цифр в формате +79991234567");
             return;
         }
         QString email = emailEdit->text().trimmed();
@@ -89,7 +99,7 @@ Employee EmployeeDialog::getEmployee() const
     result.lastName = lastNameEdit->text().toStdString();
     result.initials = initialsEdit->text().toStdString();
     result.position = positionEdit->text().toStdString();
-    result.phone = phoneEdit->text().toStdString();
+    result.phone = normalizePhone(phoneEdit->text()).toStdString();
     result.email = emailEdit->text().toStdString();
     result.status = statusCombo->currentText().toStdString();
 

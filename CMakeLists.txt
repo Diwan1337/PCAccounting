@@ -2,10 +2,16 @@ set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(BACKEND_DIR ${SRC_DIR}/backend)
 set(OPENSSL_ROOT_DIR "E:/OpenSSL-Win64" CACHE PATH "Path to the local OpenSSL installation")
 
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.16)
 project(PCAccountingQt LANGUAGES CXX)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 
 find_path(OPENSSL_INCLUDE_DIR
     NAMES openssl/evp.h
@@ -37,9 +43,7 @@ if(NOT OPENSSL_INCLUDE_DIR OR NOT OPENSSL_CRYPTO_LIBRARY)
     )
 endif()
 
-qt_standard_project_setup()
-
-qt_add_executable(PCAccountingQt
+add_executable(PCAccountingQt
     WIN32
     ${SRC_DIR}/app/main.cpp
 
@@ -81,8 +85,8 @@ target_include_directories(PCAccountingQt
 
 target_link_libraries(PCAccountingQt
     PRIVATE
-        Qt::Core
-        Qt::Widgets
+        Qt5::Core
+        Qt5::Widgets
         ${OPENSSL_CRYPTO_LIBRARY}
 )
 
