@@ -52,20 +52,12 @@ PCAccountingQt/
 - Актуальная диаграмма классов: `docs/uml/pcaccounting-class-diagram.puml`
 - Можно открыть в VS Code (PlantUML extension) или на PlantUML server.
 
-## Скриншоты
-
-<img width="3253" height="1724" alt="diagram (18)" src="https://github.com/user-attachments/assets/ad3bd31c-3125-4e84-b807-dba40907e1b7" />
-
 ### Вкладка сотрудников
 <img width="999" height="629" alt="image" src="https://github.com/user-attachments/assets/c8e07c8c-3765-4c90-b4d7-8811ee4e1349" />
 
 ### Вкладка компьютеров
 
 <img width="996" height="629" alt="image" src="https://github.com/user-attachments/assets/c6c10d70-5b6b-444e-86ca-63af8303d3fe" />
-
-### Полные таблицы
-
-<img width="1378" height="716" alt="image" src="https://github.com/user-attachments/assets/25d71daf-b3e4-4022-8b1f-3a1faec7f5b4" />
 
 ## Автор
 
